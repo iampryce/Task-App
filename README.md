@@ -12,7 +12,7 @@
 
 
 ## 📌Project Overview
-This project demonstrate how i implement DevOps and Cloud Enginner workflows starting from basic to advance tool. This project is set to take about 12 weeks. Each week contains new tools and updates on the workflow to show real DevOps Work flow. 
+This project demonstrate how i implement DevOps and Cloud Enginner workflows starting from basic to advance tool. This project is set to take about 12 weeks. Each week contains new tools and updates on chanhes to improve the workflow to show real DevOps Work flow.
 
 ## 🔋 Technologies Used
 
