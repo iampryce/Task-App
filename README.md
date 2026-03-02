@@ -125,3 +125,8 @@ Click Week 2 CI Pipeline
 Watch it run
 You should see.
 Checkout repository, Setup Node.js , Install dependencies ,Simulate tes and it should end with: Success green
+
+
+
+
+
