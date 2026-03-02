@@ -1,4 +1,4 @@
-![Jenkins Build Status](http://35.91.204.248:8080/job/task-app-jenkins-ci/badge/icon)
+
 
 <p align="center">
  <img width="126" height="126" alt="image" src="https://github.com/user-attachments/assets/9d988702-0739-44f1-97cb-57fa2d2dc38b" />
@@ -123,7 +123,108 @@ Click Actions tab
 Click Week 2 CI Pipeline
 Watch it run
 You should see.
-Checkout repository, Setup Node.js , Install dependencies ,Simulate tes and it should end with: Success green
+Checkout repository, Setup Node.js , Install dependencies ,Simulate tes and it should end with: Success green.
+
+
+
+## Week 3    (Jenkins – Enterprise-style CI/CD.) 
+
+### What ia Jenkins in simple terms.
+
+Github Action is managed by GIthub sever
+
+Jenkins Sever is self managed.
+
+Objectives:
+Launch a Linux server
+
+Install Jenkins
+
+Access Jenkins via browser
+
+Connect Jenkins to GitHub repo
+
+Run  first Jenkins build
+
+Outcome:
+GitHub repo  -> Jenkins  -> Build runs automatically 
+
+Steps
+1. Launch EC2 Server  
+Allow inbound traffic: SSH (22)           HTTP (80)        Custom TCP: 8080 (for Jenkins)
+
+2. Connect to Server ( install Java )  sudo apt update   sudo apt install fontconfig openjdk-21-jre    Verify java version:   java -version 
+
+3. Install Node.js   :  sudo apt update     sudo apt install nodejs npm -y
+
+4. Install Jenkins: use the official documentation for Ubuntu debian https://www.jenkins.io/download/      select Ubuntu/debian and follow the installation process 
+
+Choose the Long Term Support release and run the commands:
+These following commands will download Jenkins’ security key, add its official repository to Ubuntu, update the package list, and then install Jenkins.
+
+
+
+
+Commands 1  
+
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+
+  /etc/apt/sources.list.d/jenkins.list > /dev/null  
+
+Commands 2
+
+sudo apt update
+
+sudo apt install jenkins
+
+Enable/Start/Check status
+
+sudo systemctl enable jenkins
+
+sudo systemctl start jenkins
+
+sudo systemctl status jenkins
+
+
+5. Access Jenkins in Browser  http://your IP:8080  change the ip before the port to your own. Get the jenkins defualt password when the window opens : 
+
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword     
+
+Complete Jenkins Setup, Install suggested plugins , Create admin user , Save and continue.
+
+Building Jenkins Pipeline job and connecting it to the Task App.
+Steps
+
+1. Create Pipeline Job : create a new item and name it :  task-app-jenkins-ci , Selet pipeline. 
+
+2. Configure Pipeline : Scroll to pipeline and choose Pipeline script from SCM and select  SCM → Git,  add your repo URL ----------   ,  change to main  if it says master by default, create a script path for Jenkinsfile  and  Save after.    
+
+3. Create a Jenkinsfile, and paste the pipeline script .  GitHub Actions uses YAML for configuration. Jenkins uses a Groovy based pipeline language for scripting builds. So this is similar but just better than GitHub Action YAML.
+
+4. Push the Jenkins file to your repo git add Jenkinsfile    git commit -m "Add Jenkins pipeline"     git push
+
+5.Run Jenkins Build: Go back to Jenkins and click Build Now  Verify if it works. This was manual because we had to click build now we will automate in the next step.
+
+6. Enable GitHub Trigger in Jenkins: Go to your Jenkins job and click configure. Scroll down to Build Triggers  and select GitHub hook trigger for GITScm polling . and save.
+
+7. Add Webhook in GitHub: Go to your GitHub repo  Settings -> Webhooks ->  Add Webhook. Copy ypur jenkins url that contains your or ip http://yourIP:8080 and add  /github-webhook/ at the end.
+
+ Eg:  http://yourIP:8080/github-webhook/ and make sure it is http not https.   Content Type: application/json  Which events: Just the push event   then click add Webhook.  
+
+To test this: Make some changes in your local folder, maybe your html code. Then save and push to test. Now we don’t need to click build in jenkins it will run automatically. 
+
+
+git add .
+
+git commit -m "Test Jenkins webhook"
+
+git push
 
 
 
