@@ -1,4 +1,4 @@
-
+![Jenkins Build Status](http://35.91.204.248:8080/job/task-app-jenkins-ci/badge/icon)
 
 <p align="center">
  <img width="126" height="126" alt="image" src="https://github.com/user-attachments/assets/9d988702-0739-44f1-97cb-57fa2d2dc38b" />
@@ -9,7 +9,6 @@
 </h1>
 
 <p align="center">
-
 
 ## 📌Project Overview
 This project demonstrate how i implement DevOps and Cloud Enginner workflows starting from basic to advance tool. This project is set to take about 12 weeks. Each week contains new tools and updates on chanhes to improve the workflow to show real DevOps Work flow.
