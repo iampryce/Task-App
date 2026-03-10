@@ -81,7 +81,7 @@ This project demonstrate how i implement DevOps and Cloud Enginner workflows sta
 
  9.  git push -u origin main     (push to main branch)
 
-
+______________________________________________________________________________________________
 
 ##  Week 2  (CI Pipeline  GitHub Action) 
 
@@ -125,6 +125,7 @@ Watch it run
 You should see.
 Checkout repository, Setup Node.js , Install dependencies ,Simulate tes and it should end with: Success green.
 
+______________________________________________________________________________________________
 
 
 ## Week 3    (Jenkins – Enterprise-style CI/CD.) 
@@ -227,6 +228,139 @@ git commit -m "Test Jenkins webhook"
 git push
 
 
+_____________________________________________________________________________________________
+
+
+## Week 4 (Docker)
+
+### What is Docker? 
+Docker is an open source software platform for building, testing, and deploying applications using containerization. It allows developers to package an application and all its dependencies (libraries, system tools, code, and runtime) into a single, standardized unit called a container, ensuring it runs consistently across different computing environments, from a developer's laptop to the cloud.
+
+So we will be using docker to package our Task APP dependencies and build an image locally make sure it works before we now make jenkins run it automatically.
+
+Prerequisite : Install Docker desktop locally and sign up. 
+
+Steps
+
+1. Create the Dockerfile In the root of your project (same level as Jenkinsfile)
+2. 
+Explanation:
+
+In this file we will Docker how to package the backend application into a container image using Node.js.
+
+2.Build Docker Image Locally
+
+Run this in your project root: 
+```
+ docker build -t task-app . 
+```
+Explanation:
+
+This builds a Docker image from the Dockerfile so we can verify it works before automating it in Jenkins.
+
+3.Run the Container 
+
+Run this: docker run -p 3000:3000 task-app   
+
+We are mapping the backend to run on port => 3000
+
+Open this in your browser: http://localhost:3000
+
+Explanation:
+
+This tells Docker to create and start a running container from the image  we built (task-app).
+
+Before running the next step confirm that your jenkins server IP is the same. If not change your webhook IP
+
+4.Push Dockerfile to GitHub 
+
+Run 
+```
+ git add Dockerfile
+
+ git commit -m "Add Dockerfile for containerization"
+
+ git push  
+```
+Explanation:
+
+This uploads the Dockerfile to your GitHub repository so Jenkins can access it when running the CI pipeline.
+
+Because Jenkins is connected to GitHub through the webhook, pushing new code will automatically trigger a new Jenkins build.
+
+5.install Docker on Jenkins Server 
+
+On your EC2 Jenkins server run: sudo apt update
+```
+ sudo apt install docker.io -y   
+```
+Explanation:
+
+This installs Docker on the Jenkins server so the CI pipeline can build and run  container images during automated builds.
+
+6. Then run:
+   
+ ```
+  sudo systemctl start docker    
+ 
+  sudo systemctl enable docker 
+ ```
+Explanation:
+
+This starts the Docker service and ensures Docker starts automatically whenever the server restarts.
+
+
+7.Allow Jenkins to Use Docker
+
+Run this:
+```
+ sudo usermod -aG docker jenkins
+ sudo systemctl restart jenkins 
+```
+Explanation:
+
+Jenkins runs under its own user account, so we grant it permission to run Docker commands.
+
+Without this, Jenkins pipelines will fail when trying to build Docker images.
+
+See it like this, Jenkins is just a server. If we want Jenkins to build Docker images, Docker must be installed on that server.
+
+8.Update the Jenkins Pipeline (jenkinsfile) to Build the Docker Image
+
+In week 3 jenkins pipele we added just two stages
+
+I.Install dependencies
+
+II.Verify Node is installed
+
+That means Jenkins is only testing the environment, not building the container yet.
+
+To complete Week 4 , we just need to add one more stage.
+
+So now jenkins will
+
+Pull repo
+
+Install dependencies
+
+Verify Node
+
+Build Docker image
+
+By adding the Docker build stage, Jenkins can now automatically package the application into a container image whenever new code is pushed to GitHub.
+
+9.Push the Updated Jenkinsfile to GitHub
+
+10.Verify the Docker Build : Go to your jenkins server and verify your console output
+
+11.Confirm the Image exists on the Jenkins Server, Run : 
+```
+ docker images  
+```
+you should see your task app image there
+
+
+Summary:  In this step we automated container creation. Every time code is pushed, Jenkins now builds a Docker image of the application and include updates and new versions. 
 
 
 
