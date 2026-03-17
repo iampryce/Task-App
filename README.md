@@ -363,4 +363,123 @@ you should see your task app image there
 Summary:  In this step we automated container creation. Every time code is pushed, Jenkins now builds a Docker image of the application and include updates and new versions. 
 
 
+_________________________________________________________________________________________________
+
+
+
+## WeeK 5 (Container Registry) 
+
+In Week 4, we built our Docker image using Jenkins, but the image only exists on the Jenkins server.
+This is a problem because other servers or developers cannot access or reuse the image.
+To solve this, we use a container registry (Docker Hub) a central place to store Docker images so they can be pulled and run anywhere.
+
+ TASK: CREATE  A REPOSITORY IN DOCKER HUB AND PUSH DOCKER IMAGES THERE
+
+1.  Create a repository on Dockerhub
+
+1. Log in to docker via web not the desktop app  https://hub.docker.com
+
+2.Navigate to the menu on the left and select Repositories
+
+3.Add name and a short description and click create
+
+Explanation:
+
+Docker Hub is a container registry where your Docker images will be stored so they can be accessed from anywhere.
+
+2.  Login to Docker Hub (on Jenkins Server)
+
+1. 	access docker from the terminal, use command  “ sudo docker login” . 
+
+2. 	Use the secure browser login instead of typing password in terminal. https://login.docker.com/activate  (copy out the link to your broswer and also use the one time device confirmation code provided to sign in. You should see the succeeded login when this is done
+
+3. Add Tags to your Docker image
+Tagging links your local Docker image to your Docker Hub repository.
+
+Obtain your docker image ID, run “ sudo docker images” you will see your task app and other images.
+
+Tag your image  by using the command  “ sudo docker tag [your image ID] [dockerusername]/[docker reponame]:[tag]” .  you can tag it task-appv1
+
+Replace the objects in parentheses with the actual values including your desired tag word
+ 
+
+4.  Push the Image to Docker Hub
+
+Use the command- “docker push [your-user-name ] [your-repo-name]:[tag]”
+
+Replace  and your-repo-name with the actual  values you used when building. Example : docker push clint8/task-app:task-appv1
+
+You'll see layers being pushed one by one, then a final digest confirming success. (img1: digest:
+sha256:5ab865d487d42bedd7de4b1afa9c173931f89bf116f01e733f822efdcb
+209ecb size: 856)
+
+5. Verify on Docker Hub
+
+ Go to hub.docker.com → your repository → click the Tags tab. Your image
+(v1) should now be listed there.
+
+6.  Pull & Run from Anywhere
+
+To show that the app is no longer tied to one server. Run: 
+
+docker pull YOUR_DOCKER_USERNAME/your-repo-name:v1
+
+docker run -p 8080:3000 YOUR_DOCKER_USERNAME/your-repo-name:v1
+
+The first command downloads the Docker image from Docker Hub to any machine.
+
+The second command runs the container and maps port 8080 (host) to 3000 (container) so the application can be accessed from the browser.
+
+
+7.Automate in Jenkins
+
+Update your Jenkinsfile: get the latest on github and replace the correct details at the top of the code. 
+
+We are updating the jenkins file because we are adding two stages: We are adding:
+
+Tag stage →  prepares image for Docker Hub
+
+Push stage → uploads image automatically
+
+Explanation: 
+
+We automated Docker image publishing so every code change is built and stored in the registry automatically.
+
+8.Push Your Changes
+
+On your Jenkins server =>
+
+Switch to Jenkins user: sudo su - jenkins
+
+Login to docker hub: docker login 
+
+Enter your docker hub username and password
+
+This logs docker in for the jenkins user, so pipelines can push images.
+
+git add .
+
+git commit -m "Automate Docker push in Jenkins"
+
+git push
+
+
+Confirm It Worked
+
+Go to Jenkins → Build → Console Output: Look for 
+docker push your-username/repo-name:ltag
+...
+Pushed
+
+
+Week 5 Conclusion
+
+In Week 5, we moved beyond just building Docker images to storing and distributing them using Docker Hub.
+
+Previously, our images were only available on the Jenkins server, which limited how the application could be used. By introducing a container registry, we made the application portable and accessible from anywhere.
+
+We also automated the entire process in Jenkins, so every code push now builds, tags, and pushes a Docker image without manual intervention.
+
+Finally, we validated this by pulling and running the image on another environment, proving that the application is consistent and can run anywhere.
+
 
