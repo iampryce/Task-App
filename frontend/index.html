@@ -1,19 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Task App</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TaskFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Task App</h1>
-    <input id="taskInput" type="text" placeholder="Enter task">
-    <button onclick="addTask()">Add Task</button>
-    <ul id="taskList"></ul>
+  <div class="noise"></div>
 
-    <script src="app.js"></script>
+  <div class="app">
+    <header class="header">
+      <div class="header-top">
+        <div class="logo">
+          <span class="logo-icon">✦</span>
+          <span class="logo-text">TaskFlow</span>
+        </div>
+        <div class="task-counter">
+          <span id="taskCount">0</span> tasks
+        </div>
+      </div>
+      <h1 class="headline">Get things<br><em>done.</em></h1>
+      <p class="subline">Your tasks, beautifully managed.</p>
+    </header>
 
-    
-## testing 
+    <div class="input-section">
+      <div class="input-wrap">
+        <input id="taskInput" type="text" placeholder="What needs to be done?" autocomplete="off" />
+        <button onclick="addTask()" class="add-btn">
+          <span>+</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="tasks-section">
+      <div class="tasks-header">
+        <span class="tasks-label">Active</span>
+        <button onclick="clearCompleted()" class="clear-btn">Clear done</button>
+      </div>
+      <ul id="taskList"></ul>
+      <div class="empty-state" id="emptyState">
+        <span class="empty-icon">◎</span>
+        <p>No tasks yet. Add one above.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
- 
