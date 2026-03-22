@@ -9,6 +9,10 @@ app.use(express.json());
 
 let tasks = [];
 
+app.get('/', (req, res) => {
+  res.send('Task API is running');
+});
+
 app.get('/tasks', (req, res) => {
   res.json(tasks);
 });

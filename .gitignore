@@ -11,14 +11,7 @@ Thumbs.db
 # Ignore logs
 *.log
 
-# Ignore temporary files
-temp/
-tmp/
-
-# Ignore private keys
-*.pem
-*.key
-
+.gitignore
 # Ignore serverless test files
 # Ignore system files
 .DS_Store
@@ -48,5 +41,3 @@ terraform.tfstate.backup
 *.tfstate
 *.tfstate.*
 .terraform/
-.terraform/
-.terraform.lock.hcl

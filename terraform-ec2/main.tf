@@ -30,10 +30,11 @@ resource "azurerm_virtual_network" "main" {
 }
 
 resource "azurerm_subnet" "main" {
-  name                 = "devops-subnet"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes     = ["10.0.1.0/24"]
+  name                            = "devops-subnet"
+  resource_group_name             = azurerm_resource_group.main.name
+  virtual_network_name            = azurerm_virtual_network.main.name
+  address_prefixes                = ["10.0.1.0/24"]
+  default_outbound_access_enabled = false
 }
 
 resource "azurerm_public_ip" "main" {
@@ -42,6 +43,11 @@ resource "azurerm_public_ip" "main" {
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   sku                 = "Standard"
+  tags                = {}
+  zones               = []
+  ip_tags = {
+    "FirstPartyUsage" = "/Unprivileged"
+  }
 }
 
 resource "azurerm_network_interface" "main" {
@@ -71,7 +77,7 @@ resource "azurerm_network_security_group" "main" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "*"
+    source_address_prefix      = "102.88.0.0/16"
     destination_address_prefix = "*"
   }
 
@@ -134,6 +140,10 @@ resource "azurerm_linux_virtual_machine" "main" {
 
   disable_password_authentication = true
 
+  patch_mode            = "AutomaticByPlatform"
+  patch_assessment_mode = "AutomaticByPlatform"
+  bypass_platform_safety_checks_on_user_schedule_enabled = true
+
   admin_ssh_key {
     username   = "azureuser"
     public_key = file("~/.ssh/azure-devops-key.pem.pub")
@@ -151,4 +161,3 @@ resource "azurerm_linux_virtual_machine" "main" {
     version   = "latest"
   }
 }
-
