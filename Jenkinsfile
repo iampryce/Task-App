@@ -2,42 +2,57 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "iamprycedev/task-app"
+        BACKEND_IMAGE = "iamprycedev/task-app-backend"
+        FRONTEND_IMAGE = "iamprycedev/task-app-frontend"
     }
 
     stages {
 
-        stage('Install Dependencies') {
+        stage('Checkout Code') {
             steps {
-                dir('backend') {
-                    sh 'npm install'
+                checkout scm
+            }
+        }
+
+        stage('Build Backend Image') {
+            steps {
+                sh 'docker build -t $BACKEND_IMAGE:latest ./backend'
+            }
+        }
+
+        stage('Build Frontend Image') {
+            steps {
+                sh 'docker build -t $FRONTEND_IMAGE:latest ./frontend'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
             }
         }
 
-        stage('Verify Environment') {
+        stage('Push Images') {
             steps {
-                dir('backend') {
-                    sh 'node -v'
-                }
+                sh '''
+                docker push $BACKEND_IMAGE:latest
+                docker push $FRONTEND_IMAGE:latest
+                '''
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Deploy to Kubernetes') {
             steps {
-                sh 'docker build -t task-app .'
-            }
-        }
-
-        stage('Tag Docker Image') {
-            steps {
-                sh 'docker tag task-app $DOCKER_IMAGE:latest'
-            }
-        }
-
-        stage('Push to Docker Hub') {
-            steps {
-                sh 'docker push $DOCKER_IMAGE:latest'
+                sh '''
+                kubectl set image deployment/backend backend=$BACKEND_IMAGE:latest
+                kubectl set image deployment/frontend frontend=$FRONTEND_IMAGE:latest
+                '''
             }
         }
     }
