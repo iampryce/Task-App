@@ -681,3 +681,192 @@ You should see newly created pods with a recent AGE — confirming Jenkins built
 2. Commit and push
 3. Verify pods: `kubectl get pods`
 4. Open the app in the browser and confirm changes are live
+
+---
+
+## Week 9 — Monitoring (Prometheus & Grafana)
+
+### Overview
+
+This phase introduces full observability into the system by deploying a monitoring stack inside Kubernetes. Prometheus collects metrics from the cluster, and Grafana provides a visual dashboard to explore them in real time.
+
+### Steps
+
+**1. Install Helm on your server**
+
+```bash
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+helm version
+```
+
+Helm installs complex applications into Kubernetes using pre-configured packages. Instead of writing many YAML files manually, Helm handles it for you.
+
+**2. Add Prometheus Repository**
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+```
+
+Connects Helm to the public repository that contains ready-made configurations for Prometheus and Grafana.
+
+**3. Update Helm Repositories**
+
+```bash
+helm repo update
+```
+
+Fetches the latest versions of all packages, ensuring you install the most up-to-date monitoring stack.
+
+**4. Configure Kubernetes Access**
+
+```bash
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+```
+
+Gives your user permission to read the Kubernetes config file. Without this, Helm and kubectl cannot connect to the cluster.
+
+**5. Export KUBECONFIG**
+
+```bash
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+```
+
+Tells your system which config file to use to connect to Kubernetes.
+
+Test the connection:
+
+```bash
+kubectl get nodes
+```
+
+**6. Install Monitoring Stack**
+
+```bash
+helm install monitoring prometheus-community/kube-prometheus-stack
+```
+
+Deploys a complete monitoring system into your Kubernetes cluster in one command — Prometheus, Grafana, and Alertmanager all included.
+
+**7. Verify Installation**
+
+```bash
+kubectl get pods
+```
+
+You should see new pods for Prometheus, Grafana, and Alertmanager — confirming the monitoring stack is running ✅
+
+**8. Configure Grafana Service Ports**
+
+Check the current Grafana service:
+
+```bash
+kubectl get svc monitoring-grafana
+```
+
+You will see `TYPE: ClusterIP` — meaning it's internal only and not accessible from outside the cluster.
+
+Create `k8s/grafana-service.yaml` with the following:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoring-grafana
+  namespace: default
+
+spec:
+  type: NodePort
+
+  selector:
+    app.kubernetes.io/instance: monitoring
+    app.kubernetes.io/name: grafana
+
+  ports:
+    - name: http-web
+      port: 80
+      protocol: TCP
+      targetPort: 3000
+      nodePort: 32000
+```
+
+Push to GitHub:
+
+```bash
+git add .
+git commit -m "Expose Grafana via NodePort"
+git push
+```
+
+Pull on your VM:
+
+```bash
+cd Task-App
+git pull
+```
+
+Delete the old service and apply the new one:
+
+```bash
+kubectl delete svc monitoring-grafana
+kubectl apply -f k8s/grafana-service.yaml
+kubectl get svc monitoring-grafana
+```
+
+You should now see: `NodePort 80:32000/TCP` ✅
+
+Update `terraform-ec2/main.tf` to open port 32000 and apply:
+
+```hcl
+security_rule {
+  name                       = "allow-grafana-nodeport"
+  priority                   = 1009
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "32000"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
+}
+```
+
+```bash
+terraform apply
+```
+
+**9. Login to Grafana**
+
+Open in your browser: `http://YOUR_SERVER_IP:32000`
+
+Get the admin password:
+
+```bash
+kubectl get secret monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
+```
+
+| Field    | Value       |
+| -------- | ----------- |
+| Username | `admin`     |
+| Password | your output |
+
+**10. Open Kubernetes Dashboards**
+
+In Grafana you should see pre-built folders:
+
+- Kubernetes / Compute Resources / Node
+- Kubernetes / Compute Resources / Pod
+- Kubernetes / Networking
+
+Launch your app, perform some tasks, then return to Grafana and watch the metrics spike in real time.
+
+### Full Pipeline Flow
+
+```
+GitHub → Jenkins → Docker → Kubernetes → App runs → Prometheus collects data → Grafana shows it
+```
+
+### Conclusion
+
+This phase introduced the feedback layer into the DevOps workflow. Without monitoring, systems operate blindly — making it difficult to detect issues or understand performance. With Prometheus and Grafana in place, the cluster can now observe itself, tracking CPU usage, memory, pod health, and application resource usage in real time.
+
+The pipeline has evolved beyond just building and deploying. It now includes full observability — a foundational requirement for any production-ready environment.
