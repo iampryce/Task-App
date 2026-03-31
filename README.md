@@ -329,7 +329,7 @@ docker images
 
 ---
 
-## Week 6 — Container Registry (Docker Hub)
+## Week 5B — Container Registry (Docker Hub)
 
 ### Objectives
 
@@ -395,7 +395,7 @@ git push
 
 ---
 
-## Week 7 — Infrastructure as Code (Terraform + Azure)
+## Week 6 — Infrastructure as Code (Terraform + Azure)
 
 ### What is Terraform?
 
@@ -479,7 +479,7 @@ terraform destroy
 
 ---
 
-## Week 8 / 9 — Kubernetes + Full App (Frontend + Backend)
+## Week 7 / 8 — Kubernetes + Full App (Frontend + Backend)
 
 ### Overview
 
